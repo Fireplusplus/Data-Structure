@@ -84,90 +84,58 @@ public:
 				s.push(tmp->pRight);
 		}
 	}
-	
+
 	void InOrder()
 	{
-		std::stack<Node<T> *> s;
-		s.push(pRoot);
+		std::stack<Node *> s;
 		
-		Node<T> *pCur = pRoot();
-		while (!s.empty())
+		Node *pCur = pRoot;
+		while (pCur || !s.empty())
 		{
-			while (NULL != pCur->pLeft)
+			if (NULL != pCur)
 			{
-				s.push(pCur->pLeft);	
+				s.push(pCur);
 				pCur = pCur->pLeft;
 			}
-			
-			pCur = s.top();
-			Print(pCur);
-			s.pop();
-			if (NULL != pCur->pRight)
+			else
 			{
-				s.push(pCur->pRight);
+				pCur = s.top();
+				s.pop();
+				std::cout << pCur->_val << " ";
 				pCur = pCur->pRight;
 			}
 		}
 	}
-
-//	void InOrder()
-//	{
-//		std::stack<Node<T> *> s;
-//		if (NULL != pRoot)
-//			s.push(pRoot);
-//		
-//		int flag = 0;	//标记pLeft是否访问过,为0表示未被访问过
-//		while (!s.empty())
-//		{
-//			Node<T> *tmp = s.top();
-//			if (NULL != tmp->pLeft && 0 == flag)
-//				s.push(tmp->pLeft);
-//			else
-//			{
-//				Print(tmp);
-//				s.pop();
-//				flag = 1;
-//				if (NULL != tmp->pRight)
-//				{
-//					s.push(tmp->pRight);
-//					flag = 0;
-//				}
-//			}
-//		}
-//	}
 		
+//	0
+// 1		2
+//3  4	      5
 	void PostOrder()
 	{
-		std::stack<Node<T> *> s;
-		if (NULL != pRoot)
-			s.push(pRoot);
+		std::stack<Node *> s;
 		
-		Node<T> *pCur = pRoot;
-		Node<T> *pPre = NULL;
-		Node<T> *pPre_left = NULL;
-		while (!s.empty())
+		Node *pCur = pRoot;
+		Node *pPre = NULL;
+		while (pCur || !s.empty())
 		{
-			while (NULL != pCur->pLeft && pCur->pLeft != pPre_left)
+			while (NULL != pCur)
 			{
-				s.push(pCur->pLeft);
+				s.push(pCur);
 				pCur = pCur->pLeft;
-				pPre_left = pCur;
 			}
 			
-			pCur = s.top();
-			if (NULL != pCur->pRight && pCur->pRight != pPre)
+			Node *tmp = s.top();
+			if (NULL != tmp->pRight && tmp->pRight != pPre)
 			{
-				s.push(pCur->pRight);
-				pCur = pCur->pRight;
+				pCur = tmp->pRight;
+				pPre = pCur;
 			}
 			else
 			{
-				Print(pCur);
-				pPre = pCur;
+				std::cout << s.top()->_val << " ";
 				s.pop();
 			}
 		}
-	
 	}
 
 	size_t Size()
@@ -204,7 +172,7 @@ public:
 	
 	Node<T> * NearestAncestor(Node<T> *p1, Node<T> *p2)
 	{
-		if (!_IsInTree(pRoot, p1), !_IsInTree(pRoot, p2))
+		if (!_IsInTree(pRoot, p1) || !_IsInTree(pRoot, p2))
 			return NULL;
 		Node<T> *pCur = pRoot;
 		
@@ -458,10 +426,10 @@ int main()
 //	
 //	std::cout << std::endl;
 //	
-//	b.PostOrder_Recur();
-//	std::cout << std::endl;
-//	b.PostOrder();
-//	std::cout << std::endl;
+	b.PostOrder_Recur();
+	std::cout << std::endl;
+	b.PostOrder();
+	std::cout << std::endl;
 //	
 //	std::cout << std::endl;
 //	
@@ -480,13 +448,13 @@ int main()
 //	std::cout << b.IsInTree(ret) << std::endl;
 	
 
-	Node<char> *p1 = b.Find('3');
-	Node<char> *p2 = b.Find('4');
+//	Node<char> *p1 = b.Find('3');
+//	Node<char> *p2 = b.Find('4');
 //	Node<char> *ret = b.NearestAncestor(p1, p2);
 //	std::cout << ret->_val << std::endl;
 
-	Node<char> *ret = b.NearestAncestor2(p1, p2);
-	std::cout << ret->_val << std::endl;
+//	Node<char> *ret = b.NearestAncestor2(p1, p2);
+//	std::cout << ret->_val << std::endl;
 
 	return 0;
 }
