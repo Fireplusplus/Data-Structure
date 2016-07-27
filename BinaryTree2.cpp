@@ -157,9 +157,10 @@ void PostOrder(Node *_pRoot)
 
 size_t Height(Node *_pRoot)
 {
-	if (NULL == _pRoot || (NULL == _pRoot->pLeft && NULL == _pRoot->pRight))
+	if (NULL == _pRoot)
 		return 0;
-
+	if (NULL == _pRoot->pLeft && NULL == _pRoot->pRight)
+		return 1;
 
 	size_t left = Height(_pRoot->pLeft);
 	size_t right = Height(_pRoot->pRight);
@@ -219,6 +220,7 @@ bool IsInTree(Node *_pRoot, Node *pNode)
 	return IsInTree(_pRoot->pRight, pNode);	
 }
 
+//结点不是自身的祖先
 Node * NearestAncestor(Node *_pRoot, Node *p1, Node *p2)
 {
 	if (NULL == _pRoot || !IsInTree(_pRoot, p1) || !IsInTree(_pRoot, p2))
@@ -230,6 +232,7 @@ Node * NearestAncestor(Node *_pRoot, Node *p1, Node *p2)
 	bool p2_right;
 	
 	Node *pCur = _pRoot;
+	Node *pPre = NULL;
 	while (NULL != pCur)
 	{
 		p1_left = IsInTree(pCur->pLeft, p1);
@@ -237,18 +240,52 @@ Node * NearestAncestor(Node *_pRoot, Node *p1, Node *p2)
 		p1_right = IsInTree(pCur->pRight, p1);
 		p2_right = IsInTree(pCur->pRight, p2);
 	
-		if ((p1_left && p2_right) || (p1_right && p2_left) || !p1 || !p2)
+		if ((p1_left && p2_right) || (p1_right && p2_left))
 			return pCur;
+		else if ((!p1_left && !p1_right) || (!p2_left && !p2_right))
+			return pPre;
 		
 		else if(p1_left) //均在左子树
 		{
+			pPre = pCur;
 			pCur = pCur->pLeft;
 		}
 		else 
+		{
+			pPre = pCur;
 			pCur = pCur->pRight;
+		}
 	}
 
 	return NULL;
+}
+
+bool RoadRecur(std::stack<Node *> &s, Node *_pRoot, Node *pNode)
+{
+	if (NULL == pNode)
+		return false;
+	
+	s.push(_pRoot);
+	if (NULL == _pRoot)
+	{
+		s.pop();
+		return false;
+	}
+	else if (_pRoot == pNode)
+	{
+		return true;
+	}
+	else
+	{
+		if (RoadRecur(s, _pRoot->pLeft, pNode))
+		{
+			return true;
+		}
+
+		return RoadRecur(s, _pRoot->pRight, pNode);
+	}
+
+	return false;
 }
 
 void Road(std::stack<Node *> &s, Node *_pRoot, Node *pNode)
@@ -316,7 +353,14 @@ Node * NearestAncestor2(Node *_pRoot, Node *p1, Node *p2)
 	while (!s1.empty())
 	{
 		if (s1.top() == s2.top())
-			return s1.top();
+		{
+			if (p1 == s1.top() || p2 == s2.top())
+				s1.pop();
+			
+			if (!s1.empty())
+				return s1.top();
+			return NULL;
+		}
 		s1.pop();
 		s2.pop();
 	}
@@ -324,10 +368,52 @@ Node * NearestAncestor2(Node *_pRoot, Node *p1, Node *p2)
 	return NULL;
 }
 
+//找到第一个度不为2的结点，则后续所有结点皆不能有孩子
+bool IsComplete(Node *_pRoot)
+{
+	if (NULL == _pRoot)
+		return true;
+	
+	std::queue<Node *> q;
+	q.push(_pRoot);
+	
+	bool flag = false;
+	while (!q.empty())
+	{
+		if (flag)
+		{
+			Node *pCur = q.front();
+			if (NULL != pCur->pLeft || NULL != pCur->pRight)
+				return false;
+			q.pop();
+		}
+		
+		if (!q.empty())
+		{
+			Node *tmp = q.front();
+			q.pop();
+			if (NULL == tmp->pLeft && NULL != tmp->pRight)
+				return false;
+			
+			if (NULL == tmp->pLeft || NULL == tmp->pRight)
+				flag = true;
+			
+			if (NULL != tmp->pLeft)
+				q.push(tmp->pLeft);
+			if (NULL != tmp->pRight)
+				q.push(tmp->pRight);
+		}
+	}
+	return true;
+}
+
 int main()
 {
 	//char arr[] = "013##4##25";
-	char arr[] = "9013##4##25";
+	//char arr[] = "9013##4##25";
+	//char arr[] = "01";
+	//char arr[] = "0#1";
+	char arr[] = "012";
 	Node *pRoot;
 	
 	int index = 0;
@@ -355,16 +441,17 @@ int main()
 //	std::cout << "Leaves: " << Leaves(pRoot) << std::endl;
 //	std::cout << "Size: " << Size(pRoot) << std::endl;
 
-	Node *p1 = Find(pRoot, '3');
-	Node *p2 = Find(pRoot, '1');
-//	std::cout << p1->_val << std::endl;
-//	std::cout << p2->_val << std::endl;
-//	std::cout << IsInTree(pRoot, p1) << std::endl;
-//	std::cout << IsInTree(pRoot, NULL) << std::endl;
-	Node *ret = NearestAncestor2(pRoot, p1, p2);
-		std::cout << ret->_val << std::endl;
-
-
+//	Node *p1 = Find(pRoot, '3');
+//	Node *p2 = Find(pRoot, '0');
+////	std::cout << p1->_val << std::endl;
+//////	std::cout << p2->_val << std::endl;
+//////	std::cout << IsInTree(pRoot, p1) << std::endl;
+//////	std::cout << IsInTree(pRoot, NULL) << std::endl;
+//	Node *ret = NearestAncestor2(pRoot, p1, p2);
+//		std::cout << ret->_val << std::endl;
+	
+	bool ret = IsComplete(pRoot);
+	std::cout << ret << std::endl;
 
 	return 0;
 }
