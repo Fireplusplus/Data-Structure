@@ -24,66 +24,6 @@ int MaxBit(int *arr, int n)
 	return bit;
 }
 
-// left right 左闭右开
-void _MSD(int *arr, int left, int right, int bit)
-{
-	if (left + 1 >= right || bit < 0)
-		return;
-
-	int *cnt = new int[10];
-	int *start = new int[10];
-	int *bucket = new int[right - left];
-	memset(cnt, 0, 10 * sizeof(int));
-	memset(start, 0, 10 * sizeof(int));
-	
-	int adjust = (int)pow(10, (double)(bit));
-	int i;
-	// 统计对应位出现次数 ---- // 矩阵的快速转置
-	for (i = left; i < right; ++i)
-	{
-		cnt[arr[i]/adjust % 10]++;
-	}
-
-	// 统计对应桶的起始位置
-	for (i = 1; i < 10; ++i)
-	{
-		start[i] = start[i - 1] + cnt[i - 1]; 
-	}
-
-	// 元素入桶
-	for (i = left; i < right; ++i)
-	{
-		int bkt = arr[i]/adjust % 10;
-		int addr = start[bkt];
-		bucket[addr] = arr[i];
-		start[bkt]++;
-	}
-	
-	// 对10个桶继续递归调用
-	for (i = 0; i < 10; ++i)
-	{
-		if (cnt[i] > 1)
-			_MSD(bucket, start[i] - cnt[i], start[i], bit - 1);
-	}
-	
-	for (i = left; i < right; ++i)
-	{
-		arr[i] = bucket[i];
-	}
-
-	delete[] cnt;
-	delete[] start;
-	delete[] bucket;
-}
-
-void MSD(int *arr, int n)
-{
-	assert(NULL != arr && n > 0);	
-	
-	int max_bit = MaxBit(arr, n);
-	_MSD(arr, 0, n, max_bit - 1);
-}
-
 void LSD(int arr[], int n)
 {
 	assert(NULL != arr && n > 0);
