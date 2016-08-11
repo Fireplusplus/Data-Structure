@@ -73,7 +73,7 @@ private:
 		{
 			_Destroy(pRoot->pLeft);
 			_Destroy(pRoot->pRight);
-			delete[] pRoot;
+			delete pRoot;
 			pRoot = NULL;
 		}
 	}
