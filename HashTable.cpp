@@ -76,7 +76,8 @@ public:
 	{
 		if (NULL != Find(key))	
 			return false;
-
+		CheckCapacity();
+		
 		size_t i = 0;
 		size_t index = HashFunci(key, i);
 		while (_status[index] == EXISTS)
@@ -99,6 +100,15 @@ public:
 			delete[] _tables;
 			delete[] _status;
 		}
+	}
+	
+	void Erase(const K &key)
+	{
+		std::pair<K, V> *ret = Find(key);
+		if (NULL == ret)
+			return;
+		size_t index = ret - &tables;
+		_status[index] = DELETE;	
 	}
 		
 	void Print()
