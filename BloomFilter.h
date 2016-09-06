@@ -91,7 +91,7 @@ struct HashFunc5
 {
 	size_t HashFunc(const char *str)
 	{
-		if (!*str)        // 这是由本人添加，以保证空字符串返回哈希值0  
+		if (!*str)
 			return 0;
 		register size_t hash = 1315423911;
 		while (size_t ch = (size_t)*str++)
